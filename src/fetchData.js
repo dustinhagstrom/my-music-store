@@ -11,7 +11,7 @@ const productList = [
       "https://www.yamaha.com/yamahavgn/PIM/Images/19027_12073_1_1200x1200_80813f268e73483818697e99937dbd59.jpg",
   },
   {
-    id: "123",
+    id: "234",
     title: "Red Drum Set",
     description: "good drums",
     brand: "Yamaha",

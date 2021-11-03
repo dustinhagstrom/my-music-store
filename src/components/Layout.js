@@ -15,7 +15,7 @@ function Layout({ children }) {
         <Box p={4} sx={{ flexGrow: "1", overflow: "auto" }}>
           {children}
         </Box>
-        <Footer />
+        {/* <Footer /> */}
       </Box>
     </>
   );

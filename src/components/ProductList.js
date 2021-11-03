@@ -12,19 +12,21 @@ import {
 } from "@mui/material";
 
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { useShoppingCart } from "../context/shoppingCartContext";
 
 function ProductList(props) {
-  const { products, addItemToCart } = props;
+  const { products } = props;
 
+  const { addItemToCart } = useShoppingCart();
   return (
     <Box>
       {products.map((product) => (
-        <Box mb={6}>
+        <Box mb={6} key={product.id}>
           <Card sx={{ maxWidth: 345 }}>
             <CardHeader
               action={
                 <Box>
-                  <Typography aria-label="settings">
+                  <Typography color="secondary" aria-label="settings">
                     $ {product.price / 100}
                   </Typography>
                 </Box>
@@ -36,7 +38,7 @@ function ProductList(props) {
               component="img"
               height="194"
               image={product.image}
-              alt="Paella dish"
+              alt={product.title}
             />
             <CardContent>
               <Typography variant="body2" color="text.secondary">

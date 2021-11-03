@@ -4,18 +4,6 @@ import Layout from "../components/Layout";
 import { fetchProducts } from "../fetchData";
 import ProductList from "../components/ProductList";
 
-const ADD_TO_CART_ACTION = "ADD_TO_CART";
-
-// ACTION CREATORS
-// Helper functions that easily create actions.
-
-const addToCartActionCreator = ({ id, title, price }) => {
-  return {
-    type: ADD_TO_CART_ACTION,
-    payload: { id, title, price },
-  };
-};
-
 //Actions: simple JS objects that tell us how the state should change. All actions must include a type property.
 
 const HomePage = () => {
@@ -27,23 +15,6 @@ const HomePage = () => {
   const [productData, setProductData] = useState([]);
 
   //reducer is named b/c it asks like a reduce method of array. so it takes a list or something and returns one thing. actions run through the input parameter of reducer but only one matches.
-  const reducer = (state, action) => {
-    if (action.type === "ADD_TO_CART") {
-      return [...state, action.payload];
-    }
-  };
-
-  const [shoppingCart, dispatch] = useReducer(reducer, []);
-
-  const addItemToCart = ({ id, title, price }) => {
-    dispatch(
-      addToCartActionCreator({
-        id,
-        title,
-        price,
-      })
-    );
-  };
 
   //every time that someone comes to the website, I want to call data from db here.
   useEffect(() => {
@@ -56,10 +27,7 @@ const HomePage = () => {
   return (
     <Layout>
       <Box sx={{ height: "500px" }}>
-        <ProductList
-          products={productData}
-          addItemToCart={addItemToCart}
-        ></ProductList>
+        <ProductList products={productData}></ProductList>
       </Box>
     </Layout>
   );
