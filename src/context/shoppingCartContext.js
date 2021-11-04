@@ -1,32 +1,53 @@
-// Actions: simple javascript objects that tell us how the state should change. all actions must include a type propery.
+import { createContext, useContext, useReducer, useEffect } from "react";
 
-import { createContext, useContext, useReducer } from "react";
-
-// {
-//   type: "indicates the type of action",
-// }
-
-// Hey I am the state reducer I get called everythime an action is dispatched.
-// The arguments react calls me with are the currentstate and the action that was just dispatched.
-// Whatever I return is the new state
-
-const shoppingCartContext = createContext();
+export const shoppingCartContext = createContext();
 export const useShoppingCart = () => useContext(shoppingCartContext);
 
+// Actions: simple javascript objects that tell us how the state should change. all actions must include a type propery.
 const ADD_TO_CART_ACTION = "ADD_TO_CART";
-const REMOVE_FROM_CART_ACTION = "REMOVE_FROM_CART_ACTION";
+const REMOVE_FROM_CART_ACTION = "REMOVE_FROM_CART";
+const EMPTY_CART_ACTION = "EMPTY_CART";
 
 // ACTION CREATORS
-// Helper functions that easily create actions.
+// Helper functions to easily create actions.
 
-const addToCartActionCreator = ({ id, title, price }) => {
+const sortCartItems = (shoppingCartArray) => {
+  const sorted = shoppingCartArray.sort(function (x, y) {
+    console.log({ x, y });
+    console.log({ xTimestamp: x.timestamp });
+
+    console.log("number: ", y.timestamp - x.timestamp);
+
+    return y.timestamp - x.timestamp;
+  });
+
+  console.log({ shoppingCartArray, sorted });
+
+  return sorted;
+};
+
+const getShoppingCartTotal = (shoppingCart) => {
+  const total = shoppingCart.reduce((accumulator, item, index, array) => {
+    return accumulator + item.price * item.quantity;
+  }, 0);
+
+  return total;
+};
+
+const addToCartActionCreator = ({ id, title, price, image }) => {
+  console.log("product id: ", id);
   return {
     type: ADD_TO_CART_ACTION,
-    payload: { id, title, price },
+    payload: {
+      id,
+      title,
+      price,
+      image,
+    },
   };
 };
 
-const removeFromCartActionCreator = (itemId) => {
+const removeToCartActionCreator = (itemId) => {
   return {
     type: REMOVE_FROM_CART_ACTION,
     payload: {
@@ -35,52 +56,77 @@ const removeFromCartActionCreator = (itemId) => {
   };
 };
 
-//reducer function
+// Hey I am the state reducer I get called everythime an action is dispatched.
+// The arguments react calls me with are the currentstate and the action that was just dispatched.
+// Whatever I return is the new state
+const reducer = (oldState, action) => {
+  console.log("This will run when we dispatch an action");
+  console.log("oldState: ", oldState);
+  console.log("action: ", action);
 
-const reducer = (state, action) => {
+  // Shape we want for our shopping cart state
+  // const shoppingCartExample = [
+  //   {
+  //     id: '123',
+  //     quantity: 2,
+  //     price: 50000,
+  //     title: 'piano',
+  //     timestamp: 47389478394,
+  //     image: 'http://....',
+  //   }
+  // ];
+
+  if (action.type === EMPTY_CART_ACTION) {
+    return [];
+  }
+
   if (action.type === ADD_TO_CART_ACTION) {
     const {
       payload: { id, title, price, image },
     } = action;
 
-    const itemFound = state.find((item) => item.id === action.payload.id);
+    const itemFound = oldState.find((item) => item.id === action.payload.id);
 
     if (itemFound) {
-      return [
-        ...state.filter((item) => item.id !== action.payload),
+      return sortCartItems([
+        ...oldState.filter((item) => item.id !== action.payload.id),
         {
           ...itemFound,
           quantity: itemFound.quantity + 1,
         },
-      ];
+      ]);
     }
 
-    return [
-      ...state,
+    return sortCartItems([
+      ...oldState,
       {
         id,
         title,
         price,
         image,
         quantity: 1,
+        timestamp: Date.now(),
       },
-    ];
+    ]);
   }
+
   if (action.type === REMOVE_FROM_CART_ACTION) {
-    const itemFound = state.find((item) => item.id === action.payload.id);
+    const itemFound = oldState.find((item) => item.id === action.payload.id);
 
     if (itemFound) {
       if (itemFound.quantity === 1) {
-        return state.filter((item) => item.id !== action.payload.id);
+        return sortCartItems(
+          oldState.filter((item) => item.id !== action.payload.id)
+        );
       }
 
-      return [
-        ...state.filter((item) => item.id !== action.payload.id),
+      return sortCartItems([
+        ...oldState.filter((item) => item.id !== action.payload.id),
         {
           ...itemFound,
           quantity: itemFound.quantity - 1,
         },
-      ];
+      ]);
     }
   }
 };
@@ -88,25 +134,46 @@ const reducer = (state, action) => {
 export const ShoppingCartContextProvider = (props) => {
   const { children } = props;
 
-  const [shoppingCart, dispatch] = useReducer(reducer, []);
+  const cartInLocalStorage = window.localStorage.getItem("shopping-cart");
 
-  const addItemToCart = ({ id, title, price }) => {
+  const initialShoppingCart = cartInLocalStorage
+    ? JSON.parse(cartInLocalStorage)
+    : [];
+
+  const [shoppingCart, dispatch] = useReducer(reducer, initialShoppingCart);
+
+  useEffect(() => {
+    window.localStorage.setItem("shopping-cart", JSON.stringify(shoppingCart));
+  }, [shoppingCart]);
+
+  const addItemToCart = ({ id, title, price, image }) => {
     dispatch(
       addToCartActionCreator({
         id,
         title,
         price,
+        image,
       })
     );
   };
 
   const removeFromCart = (id) => {
-    dispatch(removeFromCartActionCreator(id));
+    dispatch(removeToCartActionCreator(id));
+  };
+
+  const emptyCart = () => {
+    dispatch({ type: EMPTY_CART_ACTION });
   };
 
   return (
     <shoppingCartContext.Provider
-      value={{ shoppingCart, addItemToCart, removeFromCart }}
+      value={{
+        shoppingCart,
+        addItemToCart,
+        removeFromCart,
+        emptyCart,
+        total: getShoppingCartTotal(shoppingCart),
+      }}
     >
       {children}
     </shoppingCartContext.Provider>

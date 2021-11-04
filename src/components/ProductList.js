@@ -26,7 +26,7 @@ function ProductList(props) {
             <CardHeader
               action={
                 <Box>
-                  <Typography color="secondary" aria-label="settings">
+                  <Typography color="secondary" fontWeight="bold">
                     $ {product.price / 100}
                   </Typography>
                 </Box>
