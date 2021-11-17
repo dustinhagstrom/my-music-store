@@ -6,6 +6,7 @@ import { useShoppingCart } from "../context/shoppingCartContext";
 import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import ReplayIcon from "@mui/icons-material/Replay";
+import { logInUser } from "../fetchData";
 
 const CartPage = () => {
   const { shoppingCart, emptyCart, total } = useShoppingCart();
@@ -18,7 +19,7 @@ const CartPage = () => {
     <Layout>
       <Box>
         {shoppingCart.map((item) => (
-          <Box key={item.id}>
+          <Box key={item.id} mb={4}>
             <CartItem item={item} />
           </Box>
         ))}

@@ -1,26 +1,33 @@
-import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.css";
-import HomePage from "./pages/HomePage";
-import CartPage from "./pages/CartPage";
 import { ShoppingCartContextProvider } from "./context/shoppingCartContext";
+import CartPage from "./pages/CartPage";
+import HomePage from "./pages/HomePage";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "./redux";
+import LoginPage from "./pages/Login";
 
 function App() {
-  const [isHomePage, setIsHomePage] = useState(true);
-
   return (
-    <ShoppingCartContextProvider>
-      <Router>
-        <Switch>
-          <Route path="/cart">
-            <CartPage />
-          </Route>
-          <Route path="/">
-            <HomePage />
-          </Route>
-        </Switch>
-      </Router>
-    </ShoppingCartContextProvider>
+    <ReduxProvider store={store}>
+      <ShoppingCartContextProvider>
+        <Router>
+          {/* A <Switch> looks through its children <Route>s and
+              renders the first one that matches the current URL. */}
+          <Switch>
+            <Route path="/cart">
+              <CartPage />
+            </Route>
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+            <Route path="/">
+              <HomePage />
+            </Route>
+          </Switch>
+        </Router>
+      </ShoppingCartContextProvider>
+    </ReduxProvider>
   );
 }
 

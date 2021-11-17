@@ -1,15 +1,11 @@
 import React from "react";
-
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
+import { AppBar, Button, IconButton, Toolbar, Typography } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Header = () => {
-  const userData = undefined;
+  const user = useSelector((state) => state.user);
 
   return (
     <AppBar position="static">
@@ -17,14 +13,21 @@ const Header = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           <Link to="/">My Music Store</Link>
         </Typography>
-        <Button color="inherit">Login</Button>
+        {user ? (
+          <Typography component="p" sx={{ flexGrow: 1 }}>
+            Hi {user.name}!
+          </Typography>
+        ) : (
+          <Link to="/login">
+            <Button color="inherit">Login</Button>
+          </Link>
+        )}
         <Link to="/cart">
           <IconButton
             size="large"
             edge="start"
             color="inherit"
             aria-label="menu"
-            //   sx={{ mr: 2 }}
           >
             <ShoppingCartIcon />
           </IconButton>
